@@ -4,8 +4,7 @@ const express = require('express')
 const bodyParser = require('body-parser')
 const cors = require('cors')
 const app = express()
-const HEML = (heml) => Promise.resolve({ html: `<html>
-  <body>hi from the server</body></html>`})
+const HEML = require('heml')
 
 app.use(bodyParser.json())
 
@@ -14,6 +13,15 @@ app.options('*', cors())
 app.post('/', cors({ origin: process.env.NODE_ENV === 'development' ? 'http://localhost:8000' : 'https://heml.io' }), function (req, res) {
   return HEML(req.body.heml || '')
     .then((results) => {
+
+      if (results.errors) {
+        results.errors = results.errors.map((error) => {
+          delete error.$node
+
+          return error
+        })
+      }
+
       res.status(200).send(results)
     })
 })
