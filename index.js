@@ -16,9 +16,7 @@ app.post('/', cors({ origin: process.env.NODE_ENV === 'development' ? 'http://lo
 
       if (results.errors) {
         results.errors = results.errors.map((error) => {
-          delete error.$node
-
-          return error
+          return { selector: error.selector, message: error.toString() }
         })
       }
 
